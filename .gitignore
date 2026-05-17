@@ -12,9 +12,20 @@ target/
 *.jar
 *.war
 
+# Logs
+*.log
+backend/logs/
+
+# Env
+.env
+
 # IDE
 .idea/
 .vscode/
+
+# Build
+build/
+dist/
 
 # OS
 .DS_Store
