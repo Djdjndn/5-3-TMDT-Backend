@@ -40,6 +40,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import { format, parse, isValid, startOfMonth, endOfMonth } from 'date-fns';
 import AdminService from '../../services/AdminService';
 import { formatCurrency } from '../../utils/formatters';
+import { buildApiUrl } from '../../config';
 
 interface Order {
   id: string;
@@ -360,9 +361,6 @@ const AdminOrders: React.FC = () => {
   const prepareImageUrl = (url: string): string[] => {
     if (!url) return [];
     
-    // Backend server URL (port 8080)
-    const backendUrl = 'http://localhost:8080';
-    
     // Extract filename from path - handle multiple formats
     let filename = url;
     if (url.includes('/')) {
@@ -370,7 +368,7 @@ const AdminOrders: React.FC = () => {
     }
     
     // Use only the direct uploads/refunds path as requested
-    const imageUrl = `${backendUrl}/uploads/refunds/${filename}`;
+    const imageUrl = buildApiUrl(`/uploads/refunds/${filename}`);
     console.log("Using refund image URL:", imageUrl);
     
     return [imageUrl];

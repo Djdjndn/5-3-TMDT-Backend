@@ -2,6 +2,7 @@ package com.example.tmdt.controller;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.Collections;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
@@ -117,6 +118,16 @@ public class SignupController {
                             roles.add(modRole);
                             logger.debug("ROLE_MODERATOR assigned");
                             break;
+                        case "shipper":
+                            logger.debug("Searching for ROLE_SHIPPER");
+                            Role shipperRole = roleRepository.findByName(Role.ERole.ROLE_SHIPPER)
+                                    .orElseThrow(() -> {
+                                        logger.error("ROLE_SHIPPER not found in database");
+                                        return new RuntimeException("Error: Role is not found.");
+                                    });
+                            roles.add(shipperRole);
+                            logger.debug("ROLE_SHIPPER assigned");
+                            break;
                         default:
                             logger.debug("Invalid role '{}', searching for default ROLE_USER", role);
                             Role userRole = roleRepository.findByName(Role.ERole.ROLE_USER)
@@ -146,6 +157,12 @@ public class SignupController {
             return ResponseEntity.badRequest()
                     .body(new MessageResponse("Error: Registration failed - " + e.getMessage()));
         }
+    }
+
+    @PostMapping("/signup/shipper")
+    public ResponseEntity<?> registerShipper(@Valid @RequestBody SignupRequest signUpRequest, HttpServletRequest request) {
+        signUpRequest.setRoles(Collections.singleton("shipper"));
+        return registerUser(signUpRequest, request);
     }
     
     private String getRequestHeaders(HttpServletRequest request) {

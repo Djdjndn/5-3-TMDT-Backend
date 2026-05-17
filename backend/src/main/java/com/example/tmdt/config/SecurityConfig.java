@@ -108,12 +108,14 @@ public class SecurityConfig {
                 .antMatchers("/products/top").permitAll()
                 .antMatchers("/products/recommended").permitAll()
                 // Category related endpoints
-                .antMatchers("/api/categories/**").permitAll()
+                .antMatchers("/api/categories/**", "/categories/**").permitAll()
                 // Other public endpoints
                 .antMatchers("/api/reviews/**").permitAll()
+                .antMatchers(HttpMethod.GET, "/reviews/**").permitAll()
                 .antMatchers("/api/files/**").permitAll()
                 .antMatchers("/api/public/**").permitAll()
                 .antMatchers("/actuator/health").permitAll()
+                .antMatchers("/PaySuccess").permitAll()
                 .antMatchers("/api/notifications/**").permitAll()
                 // Chat related endpoints
                 .antMatchers("/api/chat/sessions/**").permitAll()

@@ -1,6 +1,5 @@
 import axios from 'axios';
-import { API_URL } from '../config';
-import api from './api';
+import { AUTH_SIGNIN, AUTH_SIGNUP, buildApiUrl } from '../config';
 import { UserData } from '../types/user';
 
 // Create a named instance before exporting
@@ -9,7 +8,7 @@ const AuthService = {
     console.log('Login request:', { username, password: '******' });
     try {
       // Sử dụng axios trực tiếp thay vì api instance để tránh vấn đề với baseURL
-      const response = await axios.post(`http://localhost:8080/auth/signin`, {
+      const response = await axios.post(buildApiUrl(AUTH_SIGNIN), {
         username,
         password,
       });
@@ -79,7 +78,7 @@ const AuthService = {
     
     try {
       // Sử dụng axios trực tiếp với URL đầy đủ
-      const response = await axios.post(`http://localhost:8080/auth/signup`, userData);
+      const response = await axios.post(buildApiUrl(AUTH_SIGNUP), userData);
       console.log('Register response:', response.data);
       return response.data;
     } catch (error) {
@@ -101,7 +100,7 @@ const AuthService = {
     
     try {
       // Sử dụng axios trực tiếp với URL đầy đủ
-      const response = await axios.post(`http://localhost:8080/auth/signup/shipper`, userData);
+      const response = await axios.post(buildApiUrl(`${AUTH_SIGNUP}/shipper`), userData);
       console.log('Register shipper response:', response.data);
       return response.data;
     } catch (error) {

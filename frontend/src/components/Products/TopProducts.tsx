@@ -20,6 +20,7 @@ import 'swiper/css/pagination';
 import { Product } from '../../types/product';
 import ProductService from '../../services/productService';
 import { formatCurrency } from '../../utils/formatters';
+import { buildApiUrl } from '../../config';
 
 // URL mặc định khi hình ảnh không tải được
 const DEFAULT_IMAGE_URL = '/assets/images/product-placeholder.jpg';
@@ -103,10 +104,8 @@ const TopProducts: React.FC<TopProductsProps> = ({
       return DEFAULT_IMAGE_URL;
     }
 
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-    
     // Sử dụng API endpoint trực tiếp cho hình ảnh sản phẩm
-    return `${baseUrl}/products/images/product/${product.id}`;
+    return buildApiUrl(`/products/images/product/${product.id}`);
   };
 
   // Xử lý lỗi hình ảnh

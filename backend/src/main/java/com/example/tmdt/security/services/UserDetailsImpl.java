@@ -51,8 +51,8 @@ public class UserDetailsImpl implements UserDetails {
                 user.getFullName(),
 
                 authorities,
-                user.getAddress(),
-                user.getPhoneNumber()
+                user.getPhoneNumber(),
+                user.getAddress()
         );
     }
 

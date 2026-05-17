@@ -23,6 +23,7 @@ import { Product } from '../../types/product';
 import { useCart } from '../../contexts/CartContext';
 import { useAuth } from '../../contexts/AuthContext';
 import ProductService from '../../services/productService';
+import { buildApiUrl } from '../../config';
 
 interface ProductCardProps {
   product: Product;
@@ -110,10 +111,8 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       return DEFAULT_IMAGE_URL;
     }
 
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-    
     // Always use the direct product image endpoint which handles all server-side logic
-    return `${baseUrl}/products/images/product/${product.id}`;
+    return buildApiUrl(`/products/images/product/${product.id}`);
   };
 
   // Use the getImageUrl function with the product object

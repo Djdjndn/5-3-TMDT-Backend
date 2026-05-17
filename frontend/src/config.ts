@@ -1,5 +1,14 @@
 export const API_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
 
+export const buildApiUrl = (path: string): string => {
+  const baseUrl = API_URL.endsWith('/') ? API_URL.slice(0, -1) : API_URL;
+  if (!path) {
+    return baseUrl;
+  }
+  const normalizedPath = path.startsWith('/') ? path : `/${path}`;
+  return `${baseUrl}${normalizedPath}`;
+};
+
 // Log API URL cho mục đích debug
 console.log('API URL configured as:', API_URL);
 

@@ -1,4 +1,6 @@
 // Giúp xây dựng URL ảnh sản phẩm một cách nhất quán
+import { buildApiUrl } from '../config';
+
 const FALLBACK_IMAGE = '/assets/images/product-placeholder.jpg';
 
 export const getProductImageUrl = (productId?: string | number) => {
@@ -10,8 +12,7 @@ export const getProductImageUrl = (productId?: string | number) => {
   }
 
   try {
-    const baseUrl = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-    const url = new URL(`/products/images/product/${productId}`, baseUrl);
+    const url = new URL(buildApiUrl(`/products/images/product/${productId}`), window.location.origin);
 
     // Thêm timestamp để tránh cache
     url.searchParams.append('t', Date.now().toString());

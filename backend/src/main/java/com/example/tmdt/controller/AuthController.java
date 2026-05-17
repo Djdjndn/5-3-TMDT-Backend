@@ -61,9 +61,16 @@ public class AuthController {
     public ResponseEntity<?> authenticateUser(@Valid @RequestBody LoginRequest loginRequest) {
         logger.info("Attempting to authenticate user: {}", loginRequest.getUsername());
         try {
+            String username = loginRequest.getUsername();
+            if (username != null && username.contains("@")) {
+                username = userRepository.findByEmail(username)
+                        .map(User::getUsername)
+                        .orElse(username);
+            }
+
             Authentication authentication = authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword()));
-            logger.debug("Authentication successful for user: {}", loginRequest.getUsername());
+                    new UsernamePasswordAuthenticationToken(username, loginRequest.getPassword()));
+            logger.debug("Authentication successful for user: {}", username);
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String jwt = jwtUtils.generateJwtToken(authentication);
@@ -86,8 +93,8 @@ public class AuthController {
 
                     roles,
                     primaryRole,
-                    userDetails.getAddress(),
-                    userDetails.getPhoneNumber()
+                    userDetails.getPhoneNumber(),
+                    userDetails.getAddress()
             ));
         } catch (Exception e) {
             logger.error("Authentication failed for user: {} - Error: {}", loginRequest.getUsername(), e.getMessage());

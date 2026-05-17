@@ -1,6 +1,4 @@
-import axios from 'axios';
 import api from '../services/api';
-import { API_URL } from '../config';
 import authService from './authService';
 
 // Define types for the chat service
