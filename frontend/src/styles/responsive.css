@@ -1,0 +1,55 @@
+/* Mobile shell – iPhone 15 / portrait touch layouts (< 1024px) */
+.mobile-shell {
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+}
+
+.mobile-shell main {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.mobile-shell img,
+.mobile-shell video {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Touch-friendly minimum tap targets */
+.mobile-shell .MuiButton-root,
+.mobile-shell .MuiIconButton-root,
+.mobile-shell .MuiListItemButton-root {
+  min-height: 44px;
+}
+
+.mobile-shell .MuiBottomNavigationAction-root {
+  min-width: 56px;
+  padding-top: 6px;
+}
+
+/* Prevent horizontal scroll from MUI containers */
+.mobile-shell .MuiContainer-root {
+  padding-left: 12px;
+  padding-right: 12px;
+  max-width: 100% !important;
+}
+
+/* Lightweight transitions on mobile */
+.mobile-shell * {
+  scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mobile-shell * {
+    transition-duration: 0.01ms !important;
+    animation-duration: 0.01ms !important;
+  }
+}
+
+/* Desktop shell – no overrides; preserves existing 1920×1080 layout */
+.desktop-shell {
+  width: 100%;
+}
