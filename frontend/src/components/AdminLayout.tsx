@@ -32,6 +32,7 @@ import {
   SupportAgent
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { useDevice } from '../hooks/useDevice';
 import AdminChat from './admin/AdminChat';
 
 const drawerWidth = 240;
@@ -42,7 +43,8 @@ const AdminLayout: React.FC = () => {
   const navigate = useNavigate();
   const { logout } = useAuth();
   const theme = useTheme();
-  
+  const { isMobile } = useDevice();
+
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
   };
@@ -137,24 +139,26 @@ const AdminLayout: React.FC = () => {
   );
   
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box className={isMobile ? 'mobile-shell' : 'desktop-shell'} sx={{ display: 'flex', width: '100%', overflowX: 'hidden' }}>
       <AppBar
         position="fixed"
         sx={{
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          ml: { sm: `${drawerWidth}px` },
+          width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)`,
+          ml: isMobile ? 0 : `${drawerWidth}px`,
         }}
       >
         <Toolbar>
-          <IconButton
-            color="inherit"
-            aria-label="open drawer"
-            edge="start"
-            onClick={handleDrawerToggle}
-            sx={{ mr: 2, display: { sm: 'none' } }}
-          >
-            <MenuIcon />
-          </IconButton>
+          {isMobile && (
+            <IconButton
+              color="inherit"
+              aria-label="open drawer"
+              edge="start"
+              onClick={handleDrawerToggle}
+              sx={{ mr: 2, minWidth: 44, minHeight: 44 }}
+            >
+              <MenuIcon />
+            </IconButton>
+          )}
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
             {menuItems.find(item => item.path === location.pathname)?.text || 'Quản lý hệ thống'}
           </Typography>
@@ -164,44 +168,45 @@ const AdminLayout: React.FC = () => {
       
       <Box
         component="nav"
-        sx={{ width: { sm: drawerWidth }, flexShrink: { sm: 0 } }}
+        sx={{ width: isMobile ? 0 : drawerWidth, flexShrink: 0 }}
       >
-        <Drawer
-          variant="temporary"
-          open={mobileOpen}
-          onClose={handleDrawerToggle}
-          ModalProps={{
-            keepMounted: true, // Better open performance on mobile.
-          }}
-          sx={{
-            display: { xs: 'block', sm: 'none' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
-        >
-          {drawer}
-        </Drawer>
-        <Drawer
-          variant="permanent"
-          sx={{
-            display: { xs: 'none', sm: 'block' },
-            '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
-          }}
-          open
-        >
-          {drawer}
-        </Drawer>
+        {isMobile ? (
+          <Drawer
+            variant="temporary"
+            open={mobileOpen}
+            onClose={handleDrawerToggle}
+            ModalProps={{ keepMounted: true }}
+            sx={{
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            }}
+          >
+            {drawer}
+          </Drawer>
+        ) : (
+          <Drawer
+            variant="permanent"
+            sx={{
+              '& .MuiDrawer-paper': { boxSizing: 'border-box', width: drawerWidth },
+            }}
+            open
+          >
+            {drawer}
+          </Drawer>
+        )}
       </Box>
-      
+
       <Box
         component="main"
         sx={{
           flexGrow: 1,
-          p: 3,
-          width: { sm: `calc(100% - ${drawerWidth}px)` },
-          mt: 8
+          p: isMobile ? 2 : 3,
+          width: isMobile ? '100%' : `calc(100% - ${drawerWidth}px)`,
+          mt: 8,
+          maxWidth: '100%',
+          overflowX: 'hidden',
         }}
       >
-        <Container maxWidth="lg">
+        <Container maxWidth={isMobile ? false : 'lg'} disableGutters={isMobile} sx={{ px: isMobile ? 1.5 : undefined }}>
           <Outlet />
         </Container>
       </Box>

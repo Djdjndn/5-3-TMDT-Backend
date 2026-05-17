@@ -18,8 +18,6 @@ import {
   Menu,
   MenuItem,
   Tooltip,
-  useTheme,
-  useMediaQuery,
   Container
 } from '@mui/material';
 import {
@@ -32,6 +30,7 @@ import {
   Home
 } from '@mui/icons-material';
 import { useAuth } from '../contexts/AuthContext';
+import { useDevice } from '../hooks/useDevice';
 import ShipperHeader from './ShipperHeader';
 
 const drawerWidth = 240;
@@ -42,8 +41,7 @@ const ShipperLayout = () => {
   const { user, logout } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
-  const theme = useTheme();
-  const isMobile = useMediaQuery(theme.breakpoints.down('md'));
+  const { isMobile } = useDevice();
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -73,7 +71,7 @@ const ShipperLayout = () => {
  
 
   return (
-    <Box sx={{ display: 'flex' }}>
+    <Box className={isMobile ? 'mobile-shell' : 'desktop-shell'} sx={{ display: 'flex', width: '100%', overflowX: 'hidden' }}>
       <CssBaseline />
       {isMobile ? (
         <ShipperHeader />
@@ -148,7 +146,7 @@ const ShipperLayout = () => {
         }}
       >
         <Toolbar sx={{ display: { xs: 'none', sm: 'block' } }} />
-        <Container maxWidth="lg">
+        <Container maxWidth={isMobile ? false : 'lg'} disableGutters={isMobile} sx={{ px: isMobile ? 1.5 : undefined, maxWidth: '100%' }}>
           <Outlet />
         </Container>
       </Box>

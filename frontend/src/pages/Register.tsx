@@ -14,6 +14,7 @@ import {
 } from '@mui/material';
 import { PersonAddOutlined } from '@mui/icons-material';
 import authService from '../services/authService';
+import { AUTH_SIGNUP, buildApiUrl } from '../config';
 
 const Register: React.FC = () => {
   const [username, setUsername] = useState('');
@@ -62,7 +63,7 @@ const Register: React.FC = () => {
       password: '*****'
     });
     console.log('Content-Type being used:', 'application/json');
-    console.log('Full request URL:', 'http://localhost:8080/api/auth/signup');
+    console.log('Full request URL:', buildApiUrl(AUTH_SIGNUP));
     
     setLoading(true);
     

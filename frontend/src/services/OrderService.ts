@@ -1,5 +1,4 @@
 import api from './api';
-import { API_URL } from '../config';
 import { Order, OrderData, OrderSummary } from '../types/order';
 
 // Create a named instance before exporting

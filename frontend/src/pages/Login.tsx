@@ -29,7 +29,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { loginWithCredentials } = useAuth();
+  const { login } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
 
@@ -45,7 +45,7 @@ const Login = () => {
       const response = await authService.login(username, password);
       
       // Đăng nhập thành công, cập nhật context
-      await loginWithCredentials(username, password);
+      login(response);
       
       // Chuyển hướng dựa vào vai trò
       const primaryRole = response.primaryRole;

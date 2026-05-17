@@ -1,5 +1,4 @@
 import api from './api';
-import { API_URL } from '../config';
 import { Product } from '../types/product';
 
 // Interface para resposta paginada da API
@@ -35,7 +34,7 @@ interface ReviewData {
 const ProductService = {
 
   getProductById(id: string) {
-    return api.get<Product>(`${API_URL}/products/${id}`);
+    return api.get<Product>(`/products/${id}`);
   },
 
 
@@ -48,18 +47,18 @@ const ProductService = {
     // Nếu có lọc nâng cao, sử dụng endpoint mới
     if (hasAdvancedFilters) {
       console.log('Using advanced search endpoint with filters');
-      return api.get(`${API_URL}/products/search/advanced`, { params });
+      return api.get(`/products/search/advanced`, { params });
     }
     
     // tìm kiếm sử dụng endpoint /search trước
-    return api.get(`${API_URL}/products/search`, { params })
+    return api.get(`/products/search`, { params })
       .catch(error => {
         console.log('Primary search endpoint failed:', error.message);
         
         // Nếu có category, thử endpoint category
         if (params.category && params.category !== 'all') {
           console.log('Trying category endpoint as fallback');
-          return api.get(`${API_URL}/products/category/${params.category}`, {
+          return api.get(`/products/category/${params.category}`, {
             params: { 
               keyword: params.keyword || params.search || '', 
               page: params.page, 
@@ -70,7 +69,7 @@ const ProductService = {
         }
 
         console.log('Trying main products endpoint as fallback');
-        return api.get(`${API_URL}/products`, { 
+        return api.get(`/products`, {
           params: { 
             keyword: params.keyword || params.search || '',
             category: params.category,
@@ -83,20 +82,20 @@ const ProductService = {
   },
 
   getRecommendedProducts() {
-    return api.get<Product[]>(`${API_URL}/products/recommended`);
+    return api.get<Product[]>(`/products/recommended`);
   },
 
 
 
   getCategories() {
-    return api.get(`${API_URL}/categories`);
+    return api.get(`/categories`);
   },
 
 
 
   addReview(productId: string, reviewData: ReviewData) {
     console.log('Sending review data:', reviewData);
-    return api.post(`${API_URL}/products/${productId}/reviews`, reviewData, {
+    return api.post(`/products/${productId}/reviews`, reviewData, {
       params: {
         includeUserDetails: true, // Đảm bảo server trả về thông tin người dùng đầy đủ
         allowMultiple: true // Cho phép người dùng đánh giá nhiều lần
@@ -106,7 +105,7 @@ const ProductService = {
 
   // Phương thức để lấy gợi ý tìm kiếm
   getSearchSuggestions(term: string) {
-    return api.get(`${API_URL}/products/search`, {
+    return api.get(`/products/search`, {
       params: { 
         keyword: term,
         size: 5,  
@@ -114,7 +113,7 @@ const ProductService = {
       }
     }).catch(() => {
 
-      return api.get(`${API_URL}/products`, {
+        return api.get(`/products`, {
         params: { keyword: term, size: 5 }
       }).catch(() => {
 
@@ -131,7 +130,7 @@ const ProductService = {
 
   // Phương thức để lấy giá cao nhất của sản phẩm
   getMaxPrice() {
-    return api.get(`${API_URL}/products/max-price`)
+    return api.get(`/products/max-price`)
       .catch(() => {
         return Promise.resolve({
           data: { maxPrice: 100000000 },
@@ -145,11 +144,11 @@ const ProductService = {
 
   // Phương thức đánh dấu đánh giá là hữu ích
   markReviewHelpful(reviewId: string,isHelpful:boolean) {
-    return api.post(`${API_URL}/reviews/${reviewId}/helpful?isHelpful=${isHelpful}`);
+    return api.post(`/reviews/${reviewId}/helpful?isHelpful=${isHelpful}`);
   },
 
   getTopProducts(limit: number = 4) {
-    return api.get<Product[]>(`${API_URL}/products/top?limit=${limit}`);
+    return api.get<Product[]>(`/products/top?limit=${limit}`);
   },
 
   // Lấy sản phẩm bán chạy nhất theo tháng và năm
@@ -164,7 +163,7 @@ const ProductService = {
     // Nếu không có năm, lấy năm trước
     const targetYear = year || (month ? currentYear : (currentMonth === 1 ? currentYear - 1 : currentYear));
     
-    return api.get<Product[]>(`${API_URL}/products/top-by-month`, {
+    return api.get<Product[]>(`/products/top-by-month`, {
       params: {
         month: targetMonth,
         year: targetYear,
@@ -221,7 +220,7 @@ const ProductService = {
     params.append('allowMultiple', 'true'); // Cho phép người dùng đánh giá nhiều lần
     params.append('includeUserDetails', 'true'); // Đảm bảo server trả về thông tin người dùng đầy đủ
     
-    return api.post(`${API_URL}/reviews/product/${productId}/simple?${params.toString()}`);
+    return api.post(`/reviews/product/${productId}/simple?${params.toString()}`);
   },
 
   // Delete a review
@@ -233,7 +232,7 @@ const ProductService = {
     const user = userStr ? JSON.parse(userStr) : null;
     const token = user?.accessToken || user?.token;
     
-    console.log('Delete review URL:', `${API_URL}/reviews/${reviewId}`);
+    console.log('Delete review URL:', `/reviews/${reviewId}`);
     console.log('User data:', user ? 'Available' : 'Not available', 'User ID:', user?.id);
     console.log('Using token for deletion:', token ? 'Token available' : 'No token');
     
@@ -246,7 +245,7 @@ const ProductService = {
 
   // Lấy đánh giá của người dùng hiện tại cho một sản phẩm cụ thể
   getUserReviewsForProduct(productId: string) {
-    return api.get(`${API_URL}/products/${productId}/user-reviews`, {
+    return api.get(`/products/${productId}/user-reviews`, {
       params: {
         userId: this.getCurrentUserId()
       }
@@ -292,10 +291,10 @@ const ProductService = {
     return params;
   },
   getDailyCouponIds(){ 
-    return api.get(`${API_URL}/products/daily-coupons`); 
+    return api.get(`/products/daily-coupons`);
   },
   getDailyCoupon(productId: string) {
-    return api.put(`${API_URL}/products/${productId}/daily-coupon`);
+    return api.put(`/products/${productId}/daily-coupon`);
   }
 
 };

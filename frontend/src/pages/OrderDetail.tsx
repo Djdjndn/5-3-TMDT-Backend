@@ -37,6 +37,7 @@ import { refreshHeaderNotifications } from '../components/Header';
 import { useAuth } from '../contexts/AuthContext';
 import { useNotification } from '../contexts/NotificationContext';
 import { Order } from '../types/order';
+import { buildApiUrl } from '../config';
 
 // Định nghĩa các trạng thái cho quy trình hoàn tiền
 const RefundStatus = {
@@ -94,7 +95,7 @@ const OrderDetail: React.FC = () => {
         setOrder(response.data);
         
         // Backend server URL
-        const backendUrl = 'http://localhost:8080';
+        const backendUrl = buildApiUrl('');
         
         // If order has refund images, set the URLs
         // Check both direct refundImages property and refundRequest.imageUrls
@@ -269,7 +270,7 @@ const OrderDetail: React.FC = () => {
       setOrder(orderResponse.data);
       
       // Update refund images URLs
-      const backendUrl = 'http://localhost:8080';
+      const backendUrl = buildApiUrl('');
       let newImageUrls: string[] = [];
       if (orderResponse.data.refundImages && orderResponse.data.refundImages.length > 0) {
         newImageUrls = orderResponse.data.refundImages.map((image: string) => {
@@ -327,10 +328,8 @@ const OrderDetail: React.FC = () => {
     const imgElement = event.currentTarget;
     console.error(`Failed to load image: ${imageUrl}`);
     
-    const backendUrl = 'http://localhost:8080';
-    
     const alternativeUrls = [
-      `http://localhost:8080/uploads/refunds/${imageUrl.split('/').pop()}`,
+      buildApiUrl(`/uploads/refunds/${imageUrl.split('/').pop()}`),
     ];
     
     if (imgElement.dataset.retryCount === undefined) {

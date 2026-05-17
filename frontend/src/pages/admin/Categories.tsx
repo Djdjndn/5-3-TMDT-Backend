@@ -28,7 +28,6 @@ import {
   Delete as DeleteIcon,
 } from '@mui/icons-material';
 import AdminService from '../../services/AdminService';
-import { API_URL } from '../../config';
 
 interface Category {
   id: string;

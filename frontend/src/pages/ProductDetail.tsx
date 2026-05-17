@@ -45,6 +45,7 @@ import ReviewForm from '../components/Products/ReviewForm';
 import api from '../services/api';
 import WishlistService from '../services/WishlistService';
 import toast from 'react-hot-toast';
+import { buildApiUrl } from '../config';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -81,10 +82,8 @@ const getImageUrl = (product: any): string => {
     return '/assets/images/product-placeholder.jpg';
   }
 
-  const BASE_URL = process.env.REACT_APP_API_URL || 'http://localhost:8080';
-  
   // Always use the direct product image endpoint which handles all server-side logic
-  return `${BASE_URL}/products/images/product/${product.id}`;
+  return buildApiUrl(`/products/images/product/${product.id}`);
 };
 
 const ProductDetail: React.FC = () => {

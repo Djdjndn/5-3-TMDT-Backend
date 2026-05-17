@@ -1,13 +1,21 @@
+# Node
 node_modules/
-build/
-dist/
-*.log
-.env
+npm-debug.log
 
-backend/logs/
-frontend/build/
+# React build/cache
 frontend/node_modules/
+frontend/.cache/
+frontend/build/
 
+# Java
+target/
+*.jar
+*.war
+
+# IDE
 .idea/
 .vscode/
-target/
+
+# OS
+.DS_Store
+Thumbs.db

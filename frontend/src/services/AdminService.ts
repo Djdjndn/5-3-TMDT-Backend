@@ -1,5 +1,4 @@
 import api from './api';
-import { API_URL } from '../config';
 import { Category, Product, User, Order } from '../types';
 
 interface Page<T> {
