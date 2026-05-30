@@ -13,6 +13,7 @@ import {
 } from '@mui/material';
 import SearchBar from '../SearchBar';
 import type { HeaderLogic } from '../../hooks/useHeaderLogic';
+import { FALLBACK_IMAGE, getProductImageUrl } from '../../utils/imageHelpers';
 
 interface HeaderSearchSectionProps {
   logic: HeaderLogic;
@@ -85,20 +86,26 @@ const HeaderSearchSection: React.FC<HeaderSearchSectionProps> = ({ logic, fullWi
                       },
                     }}
                   >
-                    {suggestion.imageUrl && (
-                      <Box
-                        component="img"
-                        src={suggestion.imageUrl}
-                        alt={suggestion.name}
-                        sx={{
-                          width: 40,
-                          height: 40,
-                          objectFit: 'cover',
-                          mr: 1,
-                          borderRadius: 1,
-                        }}
-                      />
-                    )}
+                    <Box
+                      component="img"
+                      src={suggestion.id ? getProductImageUrl(suggestion.id) : (suggestion.imageUrl || FALLBACK_IMAGE)}
+                      alt={suggestion.name}
+                      onError={(event: React.SyntheticEvent<HTMLImageElement>) => {
+                        event.currentTarget.src = FALLBACK_IMAGE;
+                      }}
+                      sx={{
+                        width: 48,
+                        height: 48,
+                        objectFit: 'contain',
+                        mr: 1.5,
+                        borderRadius: 2,
+                        bgcolor: '#F8FAFC',
+                        border: '1px solid',
+                        borderColor: 'divider',
+                        p: 0.5,
+                        flexShrink: 0,
+                      }}
+                    />
                     <Box>
                       <Typography variant="body2">{suggestion.name}</Typography>
                       <Typography variant="caption" color="text.secondary">

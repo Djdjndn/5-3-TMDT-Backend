@@ -194,6 +194,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedYear, setSelectedYear] = useState<number>(new Date().getFullYear());
   const [filteredSalesData, setFilteredSalesData] = useState<any[]>([]);
   const [filteredDeliveredRevenue, setFilteredDeliveredRevenue] = useState<number>(0);
+  const [quarterlyRevenueData, setQuarterlyRevenueData] = useState<any[]>([]);
 
   // State cho modal sản phẩm bán chạy
   const [topProductsData, setTopProductsData] = useState<TopProductSales[]>([]);
@@ -245,6 +246,25 @@ const AdminDashboard: React.FC = () => {
       let recentOrders: OrderData[] = Array.isArray(dashboardResponse.recentOrders) 
         ? dashboardResponse.recentOrders 
         : [];
+
+      const quarterlyRevenue = [1, 2, 3, 4].map((quarter) => {
+        const revenue = recentOrders
+          .filter((order: OrderData) => {
+            if (!order.date || order.status?.toUpperCase() !== 'DELIVERED') return false;
+            const orderDate = new Date(order.date);
+            const orderQuarter = Math.floor(orderDate.getMonth() / 3) + 1;
+            return orderDate.getFullYear() === selectedYear && orderQuarter === quarter;
+          })
+          .reduce((total: number, order: OrderData) => {
+            return total + (safeParseFloat(order.totalAmount) || safeParseFloat(order.amount));
+          }, 0);
+
+        return {
+          quarter: `Quý ${quarter}`,
+          revenue,
+        };
+      });
+      setQuarterlyRevenueData(quarterlyRevenue);
         
       // Lấy danh sách sản phẩm bán chạy
       const topProducts: totalOrderItem[] = Array.isArray(dashboardResponse.totalOrderItem) 
@@ -443,12 +463,12 @@ const AdminDashboard: React.FC = () => {
 
   return (
     <Box sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
+      <Typography variant="h2" sx={{ fontSize: { xs: 30, md: 36 }, mb: 1 }}>
         Bảng điều khiển quản trị
       </Typography>
 
       {/* Bộ lọc thời gian */}
-      <Paper sx={{ p: 2, mb: 4 }}>
+      <Paper sx={{ p: 3, mb: 4, border: '1px solid', borderColor: 'divider', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
         <Box sx={{ display: 'flex', alignItems: 'center', mb: 2 }}>
           <FilterIcon sx={{ mr: 1 }} />
           <Typography variant="h6">Bộ lọc thời gian</Typography>
@@ -879,6 +899,37 @@ const AdminDashboard: React.FC = () => {
                       <Typography color="textSecondary">Không có dữ liệu trạng thái đơn hàng</Typography>
                     </Box>
                   )}
+                </Box>
+              </CardContent>
+            </Card>
+          </Grid>
+          <Grid item xs={12}>
+            <Card>
+              <CardContent>
+                <Typography variant="h6" gutterBottom>
+                  Doanh thu theo quý năm {selectedYear}
+                </Typography>
+                <Box height={320}>
+                  <ResponsiveContainer width="100%" height="100%">
+                    <BarChart
+                      data={quarterlyRevenueData}
+                      margin={{ top: 20, right: 30, left: 20, bottom: 5 }}
+                    >
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="quarter" />
+                      <YAxis />
+                      <RechartsTooltip
+                        formatter={(value: ValueType) => {
+                          if (typeof value === 'number') {
+                            return formatCurrency(value);
+                          }
+                          return value;
+                        }}
+                      />
+                      <Legend />
+                      <Bar dataKey="revenue" name="Doanh thu" fill="#00C49F" />
+                    </BarChart>
+                  </ResponsiveContainer>
                 </Box>
               </CardContent>
             </Card>

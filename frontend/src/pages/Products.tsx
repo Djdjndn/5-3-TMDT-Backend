@@ -712,9 +712,9 @@ const Products: React.FC = () => {
   };
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
       {/* Breadcrumbs */}
-      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 4 }}>
+      <Breadcrumbs aria-label="breadcrumb" sx={{ mb: 3 }}>
         <Link
           underline="hover"
           color="inherit"
@@ -726,11 +726,27 @@ const Products: React.FC = () => {
         </Link>
         <Typography color="text.primary">Sản phẩm</Typography>
       </Breadcrumbs>
-      
+      <Box sx={{ mb: 4 }}>
+        <Typography variant="h2" sx={{ fontSize: { xs: 30, md: 36 }, mb: 1 }}>
+          Sản phẩm công nghệ
+        </Typography>
+        <Typography color="text.secondary">
+          Tìm kiếm, lọc và chọn thiết bị phù hợp cho nhu cầu mua sắm.
+        </Typography>
+      </Box>
+
       <Grid container spacing={3}>
         {/* Filters and Search */}
         <Grid item xs={12}>
-          <Paper sx={{ p: 2, mb: 4 }}>
+          <Paper
+            sx={{
+              p: { xs: 2, md: 3 },
+              mb: 4,
+              border: '1px solid',
+              borderColor: 'divider',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            }}
+          >
             <Box display="flex" alignItems="center" flexWrap="wrap" gap={2}>
               <form onSubmit={handleSearchSubmit} style={{ flexGrow: 1, minWidth: '200px' }}>
                 <Autocomplete
@@ -916,7 +932,7 @@ const Products: React.FC = () => {
         </Grid>
         
         {/* Main Content - Products and Sidebar */}
-        <Grid item xs={12} md={8}>
+        <Grid item xs={12}>
           <Box sx={{ mb: 4 }}>
             <Typography variant="h4" gutterBottom>
               Tất Cả Sản Phẩm {totalProducts > 0 && `(${totalProducts})`}
@@ -934,7 +950,7 @@ const Products: React.FC = () => {
                 {/* Hiển thị sản phẩm dạng lưới */}
                 <Grid container spacing={3}>
                   {products.map((product) => (
-                    <Grid item xs={12} sm={6} md={4} key={product.id}>
+                    <Grid item xs={12} sm={6} md={3} key={product.id}>
                       <ProductCard product={product} />
                     </Grid>
                   ))}
@@ -960,8 +976,16 @@ const Products: React.FC = () => {
         </Grid>
         
         {/* Sidebar - Top and Recommended Products */}
-        <Grid item xs={12} md={4}>
-          <Paper sx={{ p: 3, mb: 4 }}>
+        <Grid item xs={12}>
+          <Paper
+            sx={{
+              p: { xs: 2, md: 3 },
+              mb: 4,
+              border: '1px solid',
+              borderColor: 'divider',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            }}
+          >
             <Typography variant="h5" gutterBottom>
               Sản Phẩm Bán Chạy
             </Typography>

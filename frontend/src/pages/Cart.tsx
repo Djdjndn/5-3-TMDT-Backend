@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   Container,
@@ -16,7 +16,6 @@ import {
   TableContainer,
   TableHead,
   TableRow,
-  Alert,
   useTheme
 } from '@mui/material';
 import {
@@ -30,7 +29,7 @@ import { useCart } from '../contexts/CartContext';
 import { useAuth } from '../contexts/AuthContext';
 
 const Cart: React.FC = () => {
-  const { items, updateQuantity, removeFromCart, clearCart } = useCart();
+  const { items, updateQuantity, removeFromCart } = useCart();
   const { isAuthenticated } = useAuth();
   const navigate = useNavigate();
   const theme = useTheme();
@@ -49,7 +48,12 @@ const Cart: React.FC = () => {
   };
   
   const formatCurrency = (amount: number) => {
-    return `${amount.toFixed(2)} VND`;
+    return new Intl.NumberFormat('vi-VN', {
+      style: 'currency',
+      currency: 'VND',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount);
   };
   
   const handleCheckout = () => {
@@ -83,17 +87,25 @@ const Cart: React.FC = () => {
   }
   
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
-      <Typography variant="h4" gutterBottom>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
+      <Typography variant="h4" gutterBottom sx={{ fontWeight: 800 }}>
         Giỏ hàng của bạn
       </Typography>
       
       <Grid container spacing={4}>
         {/* Cart Items */}
         <Grid item xs={12} lg={8}>
-          <TableContainer component={Paper} sx={{ mb: { xs: 4, lg: 0 } }}>
+          <TableContainer
+            component={Paper}
+            sx={{
+              mb: { xs: 4, lg: 0 },
+              borderRadius: 3,
+              overflow: 'hidden',
+              boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)',
+            }}
+          >
             <Table>
-              <TableHead>
+              <TableHead sx={{ bgcolor: '#f8fafc' }}>
                 <TableRow>
                   <TableCell>Sản phẩm</TableCell>
                   <TableCell align="center">Giá</TableCell>
@@ -106,14 +118,14 @@ const Cart: React.FC = () => {
                 {items.map((item) => (
                   <TableRow key={item.id}>
                     <TableCell>
-                      <Box display="flex" alignItems="center">
+                      <Box display="flex" alignItems="center" gap={2}>
                         <Box
                           component="img"
                           src={item.imageUrl || 'https://via.placeholder.com/80'}
                           alt={item.name}
-                          sx={{ width: 80, height: 80, objectFit: 'contain', mr: 2 }}
+                          sx={{ width: 84, height: 84, objectFit: 'contain', bgcolor: '#f8fafc', borderRadius: 2, p: 1 }}
                         />
-                        <Typography variant="body1">{item.name}</Typography>
+                        <Typography variant="body1" sx={{ fontWeight: 700 }}>{item.name}</Typography>
                       </Box>
                     </TableCell>
                     <TableCell align="center">
@@ -170,8 +182,8 @@ const Cart: React.FC = () => {
         
         {/* Order Summary */}
         <Grid item xs={12} lg={4}>
-          <Paper sx={{ p: 3 }}>
-            <Typography variant="h6" gutterBottom>
+          <Paper sx={{ p: 3, borderRadius: 3, position: { lg: 'sticky' }, top: 24, boxShadow: '0 10px 30px rgba(15, 23, 42, 0.08)' }}>
+            <Typography variant="h6" gutterBottom sx={{ fontWeight: 800 }}>
               Tóm tắt đơn hàng
             </Typography>
             

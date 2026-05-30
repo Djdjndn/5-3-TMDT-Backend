@@ -47,6 +47,7 @@ const TopProducts: React.FC<TopProductsProps> = ({
   const [currentMonth, setCurrentMonth] = useState<number>(0);
   const [currentYear, setCurrentYear] = useState<number>(0);
   const navigate = useNavigate();
+  const sectionLayout = Boolean(title);
 
   useEffect(() => {
     // Lấy tháng, năm hiện tại
@@ -151,31 +152,48 @@ const TopProducts: React.FC<TopProductsProps> = ({
         </Grid>
       ) : (
         <>
-          {/* Display as stack for sidebar view */}
+          {/* Display as product grid on sections and compact stack in sidebars. */}
           <Box sx={{ display: { xs: 'none', md: 'block' } }}>
             <Grid container spacing={2}>
               {products.map((product) => (
-                <Grid item xs={12} key={product.id}>
+                <Grid item xs={12} sm={sectionLayout ? 6 : 12} md={sectionLayout ? 3 : 12} key={product.id}>
                   <Card 
                     sx={{ 
-                      display: 'flex',
                       height: '100%',
-                      transition: 'transform 0.2s',
+                      overflow: 'hidden',
+                      transition: 'transform 0.2s, box-shadow 0.2s',
                       '&:hover': {
-                        transform: 'scale(1.02)',
+                        transform: 'translateY(-4px)',
+                        boxShadow: '0 10px 25px rgba(0,0,0,0.08)',
                       },
                     }}
                   >
-                    <CardActionArea onClick={() => handleProductClick(product.id)} sx={{ display: 'flex', alignItems: 'flex-start' }}>
+                    <CardActionArea
+                      onClick={() => handleProductClick(product.id)}
+                      sx={{
+                        display: 'flex',
+                        flexDirection: sectionLayout ? 'column' : 'row',
+                        alignItems: sectionLayout ? 'stretch' : 'flex-start',
+                        height: '100%',
+                      }}
+                    >
                       <CardMedia
                         component="img"
-                        sx={{ width: 100, height: 100, objectFit: 'cover' }}
+                        sx={{
+                          width: sectionLayout ? '100%' : 100,
+                          height: sectionLayout ? 190 : 100,
+                          objectFit: 'contain',
+                          bgcolor: '#F8FAFC',
+                          p: 1.5,
+                          transition: 'transform 0.2s',
+                          '.MuiCard-root:hover &': { transform: 'scale(1.05)' },
+                        }}
                         image={imageErrors[product.id] ? DEFAULT_IMAGE_URL : getImageUrl(product)}
                         alt={product.name}
                         onError={() => handleImageError(product.id)}
                       />
                       <CardContent sx={{ flex: '1 0 auto', p: 2 }}>
-                        <Typography variant="subtitle1" component="h3" noWrap>
+                        <Typography variant="subtitle1" component="h3" noWrap sx={{ fontWeight: 700 }}>
                           {product.name}
                         </Typography>
                         <Box display="flex" alignItems="center" sx={{ mb: 0.5 }}>
@@ -184,7 +202,7 @@ const TopProducts: React.FC<TopProductsProps> = ({
                             ({typeof product.rating === 'object' ? 0 : product.rating})
                           </Typography>
                         </Box>
-                        <Typography variant="h6" color="primary">
+                        <Typography variant="h6" color="error.main" sx={{ fontWeight: 800 }}>
                           {formatCurrency(product.price)}
                         </Typography>
                       </CardContent>

@@ -17,6 +17,7 @@ import {
 } from '@mui/material';
 import {
   ShoppingCart as CartIcon,
+  Storefront as StorefrontIcon,
   Favorite as FavoriteIcon,
   Person as PersonIcon,
   Logout as LogoutIcon,
@@ -54,29 +55,47 @@ const HeaderDesktopView: React.FC<HeaderDesktopViewProps> = ({ logic }) => {
   } = logic;
 
   return (
-    <AppBar position="static">
+    <AppBar
+      position="sticky"
+      color="default"
+      sx={{
+        bgcolor: 'background.paper',
+        color: 'text.primary',
+        top: 0,
+        zIndex: (muiTheme) => muiTheme.zIndex.drawer + 1,
+      }}
+    >
       <Container maxWidth="lg">
-        <Toolbar disableGutters>
+        <Toolbar disableGutters sx={{ minHeight: 72, gap: 2 }}>
           <Typography
             variant="h6"
             component={Link}
             to="/"
-            sx={{ flexGrow: 1, textDecoration: 'none', color: 'inherit', fontWeight: 'bold' }}
+            sx={{
+              textDecoration: 'none',
+              color: 'primary.main',
+              fontWeight: 800,
+              minWidth: 150,
+            }}
           >
-            Home
+            TechStore
           </Typography>
 
           {!isAdmin && <HeaderSearchSection logic={logic} />}
 
-          <Box sx={{ display: 'flex', ml: 'auto' }}>
+          <Box sx={{ display: 'flex', ml: 'auto', alignItems: 'center', gap: 0.5 }}>
             {!isAdmin && (
-              <Button color="inherit" component={Link} to="/products" sx={{ mr: 1 }}>
+              <Button color="inherit" component={Link} to="/products" startIcon={<StorefrontIcon />}>
                 Sản Phẩm
               </Button>
             )}
 
-            {!isAdmin && isAuthenticated && (
-              <IconButton color="inherit" onClick={handleCartClick} sx={{ mx: 0.5 }}>
+            {!isAdmin && (
+              <IconButton
+                color="primary"
+                onClick={handleCartClick}
+                sx={{ mx: 0.5, bgcolor: 'primary.light', '&:hover': { bgcolor: 'primary.light' } }}
+              >
                 <Badge badgeContent={itemCount} color="error">
                   <CartIcon />
                 </Badge>
@@ -114,7 +133,7 @@ const HeaderDesktopView: React.FC<HeaderDesktopViewProps> = ({ logic }) => {
                     to="/checkout"
                     onClick={handleCartClose}
                     disabled={itemCount === 0}
-                    sx={{ bgcolor: theme.palette.success.main }}
+                    sx={{ bgcolor: theme.palette.primary.main }}
                   >
                     Thanh toán
                   </Button>

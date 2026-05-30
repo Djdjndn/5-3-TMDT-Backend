@@ -21,7 +21,6 @@ import {
 } from '@mui/icons-material';
 import { Product } from '../../types/product';
 import { useCart } from '../../contexts/CartContext';
-import { useAuth } from '../../contexts/AuthContext';
 import ProductService from '../../services/productService';
 import { buildApiUrl } from '../../config';
 
@@ -35,14 +34,14 @@ const DEFAULT_IMAGE_URL = '/assets/images/product-placeholder.jpg';
 const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
   const navigate = useNavigate();
   const { addToCart } = useCart();
-  const { isAuthenticated } = useAuth();
   const [isFavorite, setIsFavorite] = React.useState(false);
   const [imageError, setImageError] = useState(false);
 
   // Verificar se o produto está nos favoritos quando o componente montar
   React.useEffect(() => {
     const checkFavorite = async () => {
-      if (isAuthenticated) {
+      const user = localStorage.getItem('user');
+      if (user) {
         try {
           const response = await ProductService.checkInFavorites(product.id);
           setIsFavorite(response.data);
@@ -53,7 +52,7 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
     };
 
     checkFavorite();
-  }, [product.id, isAuthenticated]);
+  }, [product.id]);
 
   const handleProductClick = () => {
     navigate(`/products/${product.id}`);
@@ -66,14 +65,15 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
       name: product.name,
       price: product.price,
       imageUrl: imageError ? DEFAULT_IMAGE_URL : getImageUrl(product),
-      quantity: 1
+      quantity: 1,
+      stock: product.stock
     });
   };
 
   const handleToggleFavorite = async (event: React.MouseEvent) => {
     event.stopPropagation();
     
-    if (!isAuthenticated) {
+    if (!localStorage.getItem('user')) {
       navigate('/login', { state: { from: window.location.pathname } });
       return;
     }
@@ -124,10 +124,17 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
         height: '100%', 
         display: 'flex', 
         flexDirection: 'column',
-        transition: 'transform 0.2s, box-shadow 0.2s',
+        position: 'relative',
+        borderRadius: 2,
+        overflow: 'hidden',
+        border: '1px solid',
+        borderColor: 'divider',
+        boxShadow: '0 8px 24px rgba(15, 23, 42, 0.08)',
+        transition: 'transform 0.2s, box-shadow 0.2s, border-color 0.2s',
         '&:hover': {
-          transform: 'translateY(-5px)',
-          boxShadow: 6
+          transform: 'translateY(-4px)',
+          boxShadow: '0 16px 40px rgba(15, 23, 42, 0.14)',
+          borderColor: 'primary.light'
         },
         cursor: 'pointer'
       }}
@@ -140,23 +147,29 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             display: 'flex', 
             alignItems: 'center', 
             justifyContent: 'center',
-            bgcolor: 'grey.100' 
+            bgcolor: 'grey.100'
           }}
         >
           <BrokenImageIcon sx={{ fontSize: 80, color: 'grey.500' }} />
         </Box>
       ) : (
-        <CardMedia
+      <CardMedia
           component="img"
           height="200"
           image={displayImageUrl}
           alt={product.name}
-          sx={{ objectFit: 'cover' }}
+          sx={{
+            objectFit: 'contain',
+            bgcolor: '#F8FAFC',
+            p: 1.5,
+            transition: 'transform 0.2s ease',
+            '.MuiCard-root:hover &': { transform: 'scale(1.05)' },
+          }}
           onError={handleImageError}
         />
       )}
-      <CardContent sx={{ flexGrow: 1 }}>
-        <Typography gutterBottom variant="h6" component="h2" noWrap>
+      <CardContent sx={{ flexGrow: 1, pb: 1 }}>
+        <Typography gutterBottom variant="h6" component="h2" noWrap sx={{ fontWeight: 700 }}>
           {product.name}
         </Typography>
         <Typography variant="body2" color="text.secondary" sx={{ 
@@ -175,8 +188,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
             ({product.reviews?.length || 0})
           </Typography>
         </Box>
-        <Box display="flex" justifyContent="space-between" alignItems="center">
-          <Typography variant="h6" color="primary">
+        <Chip
+          label="SALE"
+          color="secondary"
+          size="small"
+          sx={{ position: 'absolute', top: 12, left: 12, zIndex: 1 }}
+        />
+        <Box display="flex" justifyContent="space-between" alignItems="center" gap={1}>
+          <Typography variant="h6" color="error.main" sx={{ fontWeight: 800 }}>
             {formatPrice(product.price)}
           </Typography>
           <Chip 
@@ -186,13 +205,14 @@ const ProductCard: React.FC<ProductCardProps> = ({ product }) => {
           />
         </Box>
       </CardContent>
-      <CardActions sx={{ justifyContent: 'space-between', padding: 2 }}>
+      <CardActions sx={{ justifyContent: 'space-between', px: 2, pb: 2, pt: 1 }}>
         <Button
           size="small"
           variant="contained"
           startIcon={<AddIcon />}
           disabled={product.stock <= 0}
           onClick={handleAddToCart}
+          sx={{ borderRadius: 2, fontWeight: 700 }}
         >
           Thêm vào giỏ
         </Button>

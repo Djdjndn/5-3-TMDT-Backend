@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useCallback } from 'react';
+import React, { createContext, useCallback, useContext, useEffect, useState } from 'react';
 import { CartItem } from '../types/cart';
 
 interface CartContextType {
@@ -12,6 +12,7 @@ interface CartContextType {
 }
 
 const CartContext = createContext<CartContextType | undefined>(undefined);
+const CART_STORAGE_KEY = 'tmdt_cart_items';
 
 export const useCart = () => {
   const context = useContext(CartContext);
@@ -22,34 +23,52 @@ export const useCart = () => {
 };
 
 export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-  const [items, setItems] = useState<CartItem[]>([]);
+  const [items, setItems] = useState<CartItem[]>(() => {
+    try {
+      const savedCart = localStorage.getItem(CART_STORAGE_KEY);
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      console.error('Failed to restore cart:', error);
+      return [];
+    }
+  });
+
+  useEffect(() => {
+    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(items));
+  }, [items]);
+
+  const clampQuantity = (item: CartItem, quantity: number) => {
+    const normalized = Math.max(1, quantity);
+    return item.stock ? Math.min(item.stock, normalized) : normalized;
+  };
 
   const addToCart = (item: CartItem) => {
-    setItems(prevItems => {
-      const existingItemIndex = prevItems.findIndex(cartItem => cartItem.id === item.id);
-      
+    setItems((prevItems) => {
+      const existingItemIndex = prevItems.findIndex((cartItem) => cartItem.id === item.id);
+
       if (existingItemIndex >= 0) {
-        // Nếu sản phẩm đã tồn tại trong giỏ hàng, tăng số lượng
         const updatedItems = [...prevItems];
-        updatedItems[existingItemIndex].quantity += item.quantity || 1;
+        const existingItem = updatedItems[existingItemIndex];
+        const mergedItem = { ...existingItem, stock: item.stock ?? existingItem.stock };
+        updatedItems[existingItemIndex] = {
+          ...mergedItem,
+          quantity: clampQuantity(mergedItem, existingItem.quantity + (item.quantity || 1)),
+        };
         return updatedItems;
-      } else {
-        // Thêm sản phẩm mới vào giỏ hàng
-        return [...prevItems, item];
       }
+
+      return [...prevItems, { ...item, quantity: clampQuantity(item, item.quantity || 1) }];
     });
   };
 
   const removeFromCart = useCallback((id: string) => {
-    setItems((currentItems) =>
-      currentItems.filter((item) => item.id !== id)
-    );
+    setItems((currentItems) => currentItems.filter((item) => item.id !== id));
   }, []);
 
   const updateQuantity = useCallback((id: string, quantity: number) => {
     setItems((currentItems) =>
       currentItems.map((item) =>
-        item.id === id ? { ...item, quantity } : item
+        item.id === id ? { ...item, quantity: clampQuantity(item, quantity) } : item
       )
     );
   }, []);
@@ -59,10 +78,7 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
   }, []);
 
   const getCartTotal = useCallback(() => {
-    return items.reduce(
-      (sum, item) => sum + item.price * item.quantity,
-      0
-    );
+    return items.reduce((sum, item) => sum + item.price * item.quantity, 0);
   }, [items]);
 
   const itemCount = items.reduce((sum, item) => sum + item.quantity, 0);
@@ -74,8 +90,8 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
     updateQuantity,
     clearCart,
     itemCount,
-    getCartTotal
+    getCartTotal,
   };
 
   return <CartContext.Provider value={value}>{children}</CartContext.Provider>;
-}; 
+};

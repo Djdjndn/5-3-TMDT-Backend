@@ -59,12 +59,12 @@ const MobileBottomNav: React.FC = () => {
         <BottomNavigationAction
           label="Giỏ hàng"
           icon={
-            <Badge badgeContent={isAuthenticated && itemCount > 0 ? itemCount : 0} color="error">
+            <Badge badgeContent={itemCount > 0 ? itemCount : 0} color="error">
               <CartIcon />
             </Badge>
           }
           component={Link}
-          to={isAuthenticated ? '/cart' : '/login'}
+          to="/cart"
         />
         <BottomNavigationAction
           label="Tài khoản"

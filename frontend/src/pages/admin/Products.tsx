@@ -29,6 +29,7 @@ import {
 import AdminService from '../../services/AdminService';
 import { useTheme } from '@mui/material/styles';
 import { getProductImageUrl, FALLBACK_IMAGE } from '../../utils/imageHelpers';
+import { formatCurrency } from '../../utils/formatters';
 interface Product {
   id: string;
   name: string;
@@ -65,6 +66,16 @@ const AdminProducts: React.FC = () => {
     imageFile: null as File | null,
   });
   const theme = useTheme();
+
+  const formatProductPrice = (price: unknown) => {
+    const value = typeof price === 'number'
+      ? price
+      : typeof price === 'string'
+        ? Number(price)
+        : 0;
+
+    return formatCurrency(Number.isFinite(value) ? value : 0);
+  };
 
   useEffect(() => {
     fetchProducts();
@@ -434,13 +445,7 @@ const AdminProducts: React.FC = () => {
                     />
                   </TableCell>
                   <TableCell>{product.name || 'Unnamed product'}</TableCell>
-                  <TableCell>
-                    {typeof product.price === 'number' 
-                      ? `${product.price.toFixed(2)} VND` 
-                      : typeof product.price === 'string' 
-                        ? `${parseFloat(product.price).toFixed(2)} VND` 
-                        : '$0.00 VND'}
-                  </TableCell>
+                  <TableCell>{formatProductPrice(product.price)}</TableCell>
                   <TableCell>
                     <Chip 
                       label={

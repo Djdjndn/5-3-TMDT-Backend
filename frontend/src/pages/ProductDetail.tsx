@@ -775,13 +775,6 @@ const ProductDetail: React.FC = () => {
   };
 
   const handleAddToCart = () => {
-    if (!isAuthenticated) {
-      showSnackbar('Vui lòng đăng nhập để Thêm sản phẩm vào giỏ hàng', 'error');
-      setTimeout(() => {
-        navigate('/login', { state: { from: `/products/${productId}` } });
-      }, 1500);
-      return;
-    }
     if (product) {
       // Always use our standardized image URL
       const imageUrl = getImageUrl(product);
@@ -791,8 +784,15 @@ const ProductDetail: React.FC = () => {
         name: product.name,
         price: product.price,
         imageUrl: imageUrl,
-        quantity: quantity
+        quantity: quantity,
+        stock: product.stock
       });
+      showSnackbar(
+        isAuthenticated
+          ? 'Đã thêm sản phẩm vào giỏ hàng'
+          : 'Đã thêm vào giỏ hàng. Bạn chỉ cần đăng nhập khi thanh toán.',
+        'success'
+      );
       setAddedToCart(true);
       setTimeout(() => {
         setAddedToCart(false);
@@ -990,7 +990,7 @@ const ProductDetail: React.FC = () => {
   }
 
   return (
-    <Container maxWidth="lg" sx={{ py: 4 }}>
+    <Container maxWidth="lg" sx={{ py: { xs: 3, md: 5 } }}>
       {addedToCart && (
         <Alert severity="success" sx={{ mb: 2 }}>
           Đã thêm sản phẩm vào giỏ hàng thành công!
@@ -1000,7 +1000,16 @@ const ProductDetail: React.FC = () => {
       <Grid container spacing={4}>
         {/* Product Image */}
         <Grid item xs={12} md={6}>
-          <Paper elevation={2} sx={{ p: 2, position: 'relative' }}>
+          <Paper
+            elevation={0}
+            sx={{
+              p: { xs: 2, md: 3 },
+              position: 'relative',
+              border: '1px solid',
+              borderColor: 'divider',
+              boxShadow: '0 2px 8px rgba(0,0,0,0.05)',
+            }}
+          >
             <IconButton
               onClick={handleToggleWishlist}
               sx={{
@@ -1018,7 +1027,7 @@ const ProductDetail: React.FC = () => {
             >
               {inWishlist ? <FavoriteIcon /> : <FavoriteBorderIcon />}
             </IconButton>
-            <Box sx={{ position: 'relative', width: '100%', height: '400px', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            <Box sx={{ position: 'relative', width: '100%', height: { xs: 320, md: 420 }, display: 'flex', justifyContent: 'center', alignItems: 'center', bgcolor: '#F8FAFC', borderRadius: 3 }}>
               <Box
                 component="img"
                 src={getImageUrl(product)}
@@ -1041,8 +1050,16 @@ const ProductDetail: React.FC = () => {
 
         {/* Product Details */}
         <Grid item xs={12} md={6}>
-          <Box>
-            <Typography variant="h4" component="h1" gutterBottom>
+          <Box
+            sx={{
+              p: { xs: 0, md: 1 },
+              height: '100%',
+              display: 'flex',
+              flexDirection: 'column',
+              justifyContent: 'center',
+            }}
+          >
+            <Typography variant="h2" component="h1" sx={{ fontSize: { xs: 30, md: 40 }, mb: 2 }}>
               {product.name}
             </Typography>
 
@@ -1053,7 +1070,7 @@ const ProductDetail: React.FC = () => {
               </Typography>
             </Box>
 
-            <Typography variant="h5" color="primary" gutterBottom>
+            <Typography variant="h4" color="error.main" sx={{ fontWeight: 800, mb: 2 }}>
               {formatCurrency(product.price)}
             </Typography>
 
@@ -1063,7 +1080,7 @@ const ProductDetail: React.FC = () => {
               {product.description}
             </Typography>
 
-            <Box display="flex" alignItems="center" mb={3}>
+            <Box display="flex" alignItems="center" flexWrap="wrap" gap={1.5} mb={3}>
               <Chip
                 label={product.stock > 0 ? `Còn hàng (${product.stock} sản phẩm)` : 'Hết hàng'}
                 color={product.stock > 0 ? 'success' : 'error'}
@@ -1084,8 +1101,8 @@ const ProductDetail: React.FC = () => {
                 Nhận mã giảm giá 
               </Button>
             )}
-            <Box display="flex" alignItems="center" mb={3}>
-              <Box display="flex" alignItems="center" sx={{ border: 1, borderColor: 'divider', borderRadius: 1, mr: 2 }}>
+            <Box display="flex" alignItems="center" flexWrap="wrap" gap={2} mb={3}>
+              <Box display="flex" alignItems="center" sx={{ border: 1, borderColor: 'divider', borderRadius: 2, bgcolor: 'background.paper' }}>
                 <IconButton
                   size="small"
                   onClick={() => handleQuantityChange(Math.max(1, quantity - 1))}
@@ -1149,8 +1166,8 @@ const ProductDetail: React.FC = () => {
       </Grid>
 
       {/* Product Tabs */}
-      <Box sx={{ width: '100%', mt: 4 }}>
-        <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <Box sx={{ width: '100%', mt: 5, bgcolor: 'background.paper', border: '1px solid', borderColor: 'divider', borderRadius: 3, overflow: 'hidden' }}>
+        <Box sx={{ borderBottom: 1, borderColor: 'divider', px: 2 }}>
           <Tabs value={tabValue} onChange={handleTabChange} aria-label="product tabs">
             <Tab label="Mô Tả" id="product-tab-0" />
             <Tab label="Đánh Giá" id="product-tab-1" />

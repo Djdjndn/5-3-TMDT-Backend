@@ -18,10 +18,12 @@ import { useNavigate, useLocation } from 'react-router-dom';
 
 const Search = styled('div')(({ theme }) => ({
   position: 'relative',
-  borderRadius: theme.shape.borderRadius,
-  backgroundColor: alpha(theme.palette.common.white, 0.15),
+  borderRadius: 12,
+  backgroundColor: theme.palette.background.default,
+  border: `1px solid ${theme.palette.divider}`,
   '&:hover': {
-    backgroundColor: alpha(theme.palette.common.white, 0.25),
+    backgroundColor: theme.palette.common.white,
+    borderColor: alpha(theme.palette.primary.main, 0.35),
   },
   marginRight: theme.spacing(2),
   marginLeft: 0,
@@ -32,6 +34,7 @@ const Search = styled('div')(({ theme }) => ({
   },
   display: 'flex',
   alignItems: 'center',
+  minHeight: 44,
 }));
 
 const SearchIconWrapper = styled('div')(({ theme }) => ({
@@ -45,7 +48,7 @@ const SearchIconWrapper = styled('div')(({ theme }) => ({
 }));
 
 const StyledInputBase = styled(InputBase)(({ theme }) => ({
-  color: 'inherit',
+  color: theme.palette.text.primary,
   width: '100%',
   '& .MuiInputBase-input': {
     padding: theme.spacing(1, 1, 1, 0),
@@ -63,9 +66,9 @@ const StyledInputBase = styled(InputBase)(({ theme }) => ({
 const ActionButton = styled(IconButton)(({ theme }) => ({
   position: 'absolute',
   right: 4,
-  color: theme.palette.mode === 'dark' ? alpha(theme.palette.common.white, 0.65) : alpha(theme.palette.common.black, 0.65),
+  color: theme.palette.text.secondary,
   '&:hover': {
-    color: theme.palette.mode === 'dark' ? theme.palette.common.white : theme.palette.common.black,
+    color: theme.palette.primary.main,
   }
 }));
 

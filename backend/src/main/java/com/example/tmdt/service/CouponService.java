@@ -190,7 +190,7 @@ public class CouponService {
         
         // Kiểm tra coupon có thuộc về user cụ thể không, nếu có thì kiểm tra user hiện tại
         List<User> usersCoupon = coupon.getUsers();
-        if (usersCoupon != null && !usersCoupon.contains(user)) {
+        if (usersCoupon != null && !usersCoupon.isEmpty() && !usersCoupon.contains(user)) {
             throw new RuntimeException("Mã giảm giá không dành cho tài khoản của bạn");
         }
         
@@ -264,7 +264,7 @@ public class CouponService {
         double discount = 0;
         
         // Tính toán giảm giá dựa trên loại coupon
-        if (coupon.getType().equals("PERCENTAGE")) {
+        if (coupon.getDiscountType() == Coupon.DiscountType.PERCENTAGE) {
             // Giảm theo phần trăm
             discount = orderAmount * (coupon.getDiscountValue().doubleValue() / 100);
         } else {

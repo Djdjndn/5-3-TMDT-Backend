@@ -211,7 +211,7 @@ const HeaderMobileView: React.FC<HeaderMobileViewProps> = ({ logic }) => {
 
   return (
     <>
-      <AppBar position="sticky" sx={{ width: '100%' }}>
+      <AppBar position="sticky" color="default" sx={{ width: '100%', bgcolor: 'background.paper', color: 'text.primary' }}>
         <Toolbar sx={{ minHeight: 56, px: 1.5, gap: 0.5 }}>
           <IconButton
             color="inherit"
@@ -230,19 +230,19 @@ const HeaderMobileView: React.FC<HeaderMobileViewProps> = ({ logic }) => {
             sx={{
               flexGrow: 1,
               textDecoration: 'none',
-              color: 'inherit',
-              fontWeight: 'bold',
+              color: 'primary.main',
+              fontWeight: 800,
               fontSize: '1.1rem',
             }}
           >
-            Home
+            TechStore
           </Typography>
 
-          {!isAdmin && isAuthenticated && (
+          {!isAdmin && (
             <IconButton
-              color="inherit"
+              color="primary"
               onClick={handleCartClick}
-              sx={{ minWidth: 44, minHeight: 44 }}
+              sx={{ minWidth: 44, minHeight: 44, bgcolor: 'primary.light' }}
             >
               <Badge badgeContent={itemCount} color="error">
                 <CartIcon />

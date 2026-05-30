@@ -483,7 +483,7 @@ const Checkout: React.FC = (): JSX.Element => {
                 value={paymentMethod}
                 onChange={handlePaymentChange}
               >
-                <Paper sx={{ mb: 2, p: 2, border: paymentMethod === 'cod' ? `1px solid ${theme.palette.primary.main}` : 'none' }}>
+                <Paper sx={{ mb: 2, p: 2.5, border: `1px solid ${paymentMethod === 'cod' ? theme.palette.primary.main : theme.palette.divider}`, boxShadow: paymentMethod === 'cod' ? '0 10px 25px rgba(37,99,235,0.10)' : 'none' }}>
                   <FormControlLabel 
                     value="cod" 
                     control={<Radio />} 
@@ -498,7 +498,7 @@ const Checkout: React.FC = (): JSX.Element => {
                   />
                 </Paper>
                 
-                <Paper sx={{ mb: 2, p: 2, border: paymentMethod === 'account_balance' ? `1px solid ${theme.palette.primary.main}` : 'none' }}>
+                <Paper sx={{ mb: 2, p: 2.5, border: `1px solid ${paymentMethod === 'account_balance' ? theme.palette.primary.main : theme.palette.divider}`, boxShadow: paymentMethod === 'account_balance' ? '0 10px 25px rgba(37,99,235,0.10)' : 'none' }}>
                   <FormControlLabel 
                     value="account_balance" 
                     control={<Radio />} 
@@ -513,7 +513,7 @@ const Checkout: React.FC = (): JSX.Element => {
                   />
                 </Paper>
                 
-                <Paper sx={{ mb: 2, p: 2, border: paymentMethod === 'credit' ? `1px solid ${theme.palette.primary.main}` : 'none' }}>
+                <Paper sx={{ mb: 2, p: 2.5, border: `1px solid ${paymentMethod === 'credit' ? theme.palette.primary.main : theme.palette.divider}`, boxShadow: paymentMethod === 'credit' ? '0 10px 25px rgba(37,99,235,0.10)' : 'none' }}>
                   <FormControlLabel 
                     value="credit" 
                     control={<Radio />} 
@@ -536,7 +536,7 @@ const Checkout: React.FC = (): JSX.Element => {
             <Typography variant="h6" gutterBottom>
               Mã giảm giá
             </Typography>
-            <Paper sx={{ p: 2 }}>
+            <Paper sx={{ p: 2.5, border: '1px solid', borderColor: 'divider' }}>
               {userCoupons.length > 0 && (
                 <FormControl fullWidth sx={{ mb: 2 }}>
                   <InputLabel id="coupon-select-label">Chọn mã giảm giá của bạn</InputLabel>
@@ -683,9 +683,9 @@ const Checkout: React.FC = (): JSX.Element => {
   };
 
   return (
-    <Container maxWidth="md">
-      <Box sx={{ width: '100%', my: 5 }}>
-        <Typography variant="h4" gutterBottom>
+    <Container maxWidth="lg">
+      <Box sx={{ width: '100%', my: { xs: 3, md: 5 } }}>
+        <Typography variant="h2" sx={{ fontSize: { xs: 30, md: 36 }, mb: 1 }}>
           Thanh toán
         </Typography>
         
@@ -705,7 +705,7 @@ const Checkout: React.FC = (): JSX.Element => {
         
         <Grid container spacing={4}>
           <Grid item xs={12} md={8}>
-            <Paper sx={{ p: 3, mb: { xs: 3, md: 0 } }}>
+            <Paper sx={{ p: { xs: 2, md: 3 }, mb: { xs: 3, md: 0 }, border: '1px solid', borderColor: 'divider', boxShadow: '0 2px 8px rgba(0,0,0,0.05)' }}>
               {getStepContent(activeStep)}
               
               <Box sx={{ display: 'flex', justifyContent: 'space-between', mt: 4 }}>
@@ -740,7 +740,7 @@ const Checkout: React.FC = (): JSX.Element => {
           </Grid>
           
           <Grid item xs={12} md={4}>
-            <Card>
+            <Card sx={{ position: { md: 'sticky' }, top: 96 }}>
               <CardContent>
                 <Typography variant="h6" gutterBottom>
                   Tóm tắt đơn hàng

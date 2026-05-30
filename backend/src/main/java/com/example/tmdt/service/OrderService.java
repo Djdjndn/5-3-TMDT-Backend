@@ -106,7 +106,7 @@ public class OrderService {
                 throw new RuntimeException("Số lượng vượt quá giới hạn: " + product.getName());
             }
 
-            // Reduce stock
+            // Reduce stock only when the order is actually created
             product.setStock(product.getStock() - itemRequest.getQuantity());
             productService.updateProduct(product.getId(), product);
 
@@ -135,7 +135,7 @@ public class OrderService {
                 if (coupon != null) {
                     // Apply discount
                     BigDecimal discountAmount;
-                    if ("PERCENTAGE".equals(coupon.getDiscountType())) {
+                    if (coupon.getDiscountType() == Coupon.DiscountType.PERCENTAGE) {
                         // Calculate percentage discount using BigDecimal operations
                         BigDecimal hundred = new BigDecimal("100");
                         BigDecimal percentage = coupon.getDiscountValue().divide(hundred, 6, BigDecimal.ROUND_HALF_UP);
@@ -248,10 +248,6 @@ public class OrderService {
                 throw new RuntimeException("Số lượng vượt quá giới hạn: " + product.getName());
             }
 
-            // Reduce stock
-            product.setStock(product.getStock() - itemRequest.getQuantity());
-            productService.updateProduct(product.getId(), product);
-
             // Create order item
             OrderItem orderItem = new OrderItem(product, itemRequest.getQuantity());
             orderItem.setOrder(order);
@@ -277,7 +273,7 @@ public class OrderService {
                 if (coupon != null) {
                     // Apply discount
                     BigDecimal discountAmount;
-                    if ("PERCENTAGE".equals(coupon.getDiscountType())) {
+                    if (coupon.getDiscountType() == Coupon.DiscountType.PERCENTAGE) {
                         // Calculate percentage discount using BigDecimal operations
                         BigDecimal hundred = new BigDecimal("100");
                         BigDecimal percentage = coupon.getDiscountValue().divide(hundred, 6, BigDecimal.ROUND_HALF_UP);
@@ -369,6 +365,16 @@ public class OrderService {
     @Transactional
     public Order updateOrderStatus(Long orderId, Order.OrderStatus newStatus) {
         Order order = getOrderById(orderId);
+        Order.OrderStatus previousStatus = order.getStatus();
+
+        if (newStatus == Order.OrderStatus.CANCELLED && previousStatus != Order.OrderStatus.CANCELLED) {
+            for (OrderItem item : order.getOrderItems()) {
+                Product product = item.getProduct();
+                product.setStock(product.getStock() + item.getQuantity());
+                productService.updateProduct(product.getId(), product);
+            }
+        }
+
         order.setStatus(newStatus);
         
         Order savedOrder = orderRepository.save(order);
