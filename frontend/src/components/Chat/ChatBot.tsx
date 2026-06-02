@@ -24,9 +24,9 @@ import {
   Support as SupportIcon,
 } from '@mui/icons-material';
 import { useAuth } from '../../contexts/AuthContext';
-import axios from 'axios';
 import ChatService from '../../services/ChatService';
 import { v4 as uuidv4 } from 'uuid';
+import { WS_URL } from '../../config';
 
 // Define Message interface
 interface Message {
@@ -55,6 +55,12 @@ interface WebSocketMessage {
   isAnonymous?: boolean;
   sender?: string;
 }
+
+const buildChatWebSocketUrl = (token?: string | null) => {
+  const base = WS_URL.endsWith('/') ? WS_URL.slice(0, -1) : WS_URL;
+  const url = `${base}/chat`;
+  return token ? `${url}?token=${encodeURIComponent(token)}` : url;
+};
 
 const ChatBot: React.FC = () => {
   // Get authentication context
@@ -94,14 +100,11 @@ const ChatBot: React.FC = () => {
     return newName;
   });
   
-  // Create a separate axios instance for anonymous users
-  const anonymousAxios = axios.create();
-  
   // Refs
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const reconnectAttemptsRef = useRef(0);
   const [hasShownConnectionError, setHasShownConnectionError] = useState(false);
-  const [hasShownSystemNotifications, setHasShownSystemNotifications] = useState({
+  const [, setHasShownSystemNotifications] = useState({
     supportConnecting: false,
     adminConnected: false,
     adminDisconnected: false,
@@ -233,15 +236,7 @@ const ChatBot: React.FC = () => {
       // Lấy token từ localStorage để xác thực với WebSocket
       const token = localStorage.getItem('user') ? 
         JSON.parse(localStorage.getItem('user')!).accessToken : null;
-
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.hostname;
-      const port = host === 'localhost' ? ':8089' : ''; // Only use port in development
-      
-      // Thêm token vào URL để xác thực
-      const wsUrl = token 
-        ? `${wsProtocol}//${host}${port}/chat?token=${encodeURIComponent(token)}`
-        : `${wsProtocol}//${host}${port}/chat`;
+      const wsUrl = buildChatWebSocketUrl(token);
       
       console.log('Connecting to WebSocket at:', wsUrl);
       
@@ -1283,3 +1278,4 @@ const ChatBot: React.FC = () => {
 };
 
 export default ChatBot; 
+

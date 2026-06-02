@@ -14,8 +14,8 @@ COPY --from=deps /app/node_modules ./node_modules
 COPY . .
 
 # Create production-ready environment variables for API connection
-ARG REACT_APP_API_URL=/api
-ARG REACT_APP_WS_URL=/ws
+ARG REACT_APP_API_URL=http://localhost:8080
+ARG REACT_APP_WS_URL=ws://localhost:8089
 ENV REACT_APP_API_URL=${REACT_APP_API_URL}
 ENV REACT_APP_WS_URL=${REACT_APP_WS_URL}
 
@@ -44,12 +44,12 @@ RUN set -e \
        echo 'echo "Runtime environment:"'; \
        echo 'echo "BACKEND_HOST=${BACKEND_HOST:-backend}"'; \
        echo 'echo "BACKEND_PORT=${BACKEND_PORT:-8080}"'; \
-       echo 'echo "BACKEND_WS_PORT=${BACKEND_WS_PORT:-8088}"'; \
+       echo 'echo "BACKEND_WS_PORT=${BACKEND_WS_PORT:-8089}"'; \
        echo ''; \
        echo '# Set backend host from environment or use default'; \
        echo 'BACKEND=${BACKEND_HOST:-backend}'; \
        echo 'BACKEND_PORT=${BACKEND_PORT:-8080}'; \
-       echo 'BACKEND_WS_PORT=${BACKEND_WS_PORT:-8088}'; \
+       echo 'BACKEND_WS_PORT=${BACKEND_WS_PORT:-8089}'; \
        echo ''; \
        echo '# Print DNS info for debugging'; \
        echo 'echo "Docker DNS configuration:"'; \
@@ -76,7 +76,7 @@ RUN set -e \
        echo '# Wait for backend to be available'; \
        echo 'echo "Waiting for backend to be available at $BACKEND:$BACKEND_PORT..."'; \
        echo 'for i in $(seq 1 30); do'; \
-       echo '  if curl -s -f -o /dev/null http://$BACKEND:$BACKEND_PORT/actuator/health || curl -s -f -o /dev/null http://$BACKEND:$BACKEND_PORT/api/products; then'; \
+       echo '  if curl -s -f -o /dev/null http://$BACKEND:$BACKEND_PORT/actuator/health || curl -s -f -o /dev/null http://$BACKEND:$BACKEND_PORT/products; then'; \
        echo '    echo "Backend is available!"'; \
        echo '    break'; \
        echo '  fi'; \

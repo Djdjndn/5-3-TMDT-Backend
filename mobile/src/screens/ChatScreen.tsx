@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { Alert, FlatList, StyleSheet, Text, View } from 'react-native';
 import { chatApi } from '../api/chatApi';
 import { getErrorMessage } from '../api/client';
@@ -20,16 +20,27 @@ export const ChatScreen = () => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
-  const started = useRef(false);
+  const startedForUser = useRef<number | null>(null);
+
+  const loadMessages = useCallback(async (chatSessionId: string, silent = false) => {
+    try {
+      const list = await chatApi.messages(chatSessionId);
+      setMessages(list);
+    } catch (error) {
+      startedForUser.current = null;
+      if (!silent) {
+        Alert.alert('Không tải được tin nhắn', getErrorMessage(error));
+      }
+    }
+  }, []);
 
   const startSession = async () => {
-    if (!user || started.current) return;
-    started.current = true;
+    if (!user || startedForUser.current === user.id) return;
+    startedForUser.current = user.id;
     try {
       const session = await chatApi.createSession(user.id, user.fullName || user.username);
       setSessionId(session.id);
-      const list = await chatApi.messages(session.id);
-      setMessages(list);
+      await loadMessages(session.id);
     } catch (error) {
       Alert.alert('Không tạo được chat', getErrorMessage(error));
     }
@@ -39,6 +50,16 @@ export const ChatScreen = () => {
     startSession();
   }, [user?.id]);
 
+  useEffect(() => {
+    if (!sessionId) return;
+
+    const interval = setInterval(() => {
+      loadMessages(sessionId, true);
+    }, 4000);
+
+    return () => clearInterval(interval);
+  }, [loadMessages, sessionId]);
+
   const send = async () => {
     if (!user || !sessionId || !input.trim()) return;
     setLoading(true);
@@ -46,6 +67,7 @@ export const ChatScreen = () => {
       const message = await chatApi.sendMessage(sessionId, user.id, input.trim());
       setMessages((current) => [...current, message]);
       setInput('');
+      setTimeout(() => loadMessages(sessionId, true), 500);
     } catch (error) {
       Alert.alert('Không gửi được tin nhắn', getErrorMessage(error));
     } finally {

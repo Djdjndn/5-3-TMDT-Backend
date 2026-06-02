@@ -82,10 +82,10 @@ const NavigationGuard: React.FC<{ children: React.ReactNode }> = ({ children }) 
 
 // ChatBot Conditional Component
 const ConditionalChatBot: React.FC = () => {
-  const { isAuthenticated, user } = useAuth();
+  const { user } = useAuth();
   
   // Chỉ hiển thị ChatBot khi user đã đăng nhập và không phải admin hoặc shipper
-  if (!isAuthenticated || (user?.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_SHIPPER')))) {
+  if (user?.roles && (user.roles.includes('ROLE_ADMIN') || user.roles.includes('ROLE_SHIPPER'))) {
     return null;
   }
   

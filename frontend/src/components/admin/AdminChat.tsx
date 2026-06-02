@@ -34,6 +34,7 @@ import { useAuth } from '../../contexts/AuthContext';
 import { useSnackbar } from 'notistack';
 import MessagesList from './MessagesList';
 import { useNavigate } from 'react-router-dom';
+import { WS_URL } from '../../config';
 
 // Định nghĩa các interface
 interface Message {
@@ -66,6 +67,11 @@ interface WebSocketMessage {
   senderType?: string;
   sender?: string;
 }
+
+const buildAdminWebSocketUrl = (token: string) => {
+  const base = WS_URL.endsWith('/') ? WS_URL.slice(0, -1) : WS_URL;
+  return `${base}/chat?token=${encodeURIComponent(token)}`;
+};
 
 const AdminChat: React.FC = () => {
   const { user } = useAuth();
@@ -284,12 +290,7 @@ const AdminChat: React.FC = () => {
         socket.close();
       }
       
-      const wsProtocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
-      const host = window.location.hostname;
-      const port = host === 'localhost' ? ':8089' : '';
-      
-      // Only use token in the URL (match the format in ChatBot.tsx)
-      const wsUrl = `${wsProtocol}//${host}${port}/chat?token=${encodeURIComponent(token)}`;
+      const wsUrl = buildAdminWebSocketUrl(token);
       console.log('Connecting to WebSocket with token in URL');
       
       const newSocket = new WebSocket(wsUrl);
