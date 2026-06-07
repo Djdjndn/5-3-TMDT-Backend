@@ -24,6 +24,13 @@ import org.apache.tomcat.websocket.server.WsSci;
 @EnableWebSocket
 public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSocketConfigurer {
 
+    private static final String[] ALLOWED_ORIGINS = {
+        "http://localhost",
+        "http://127.0.0.1",
+        "http://localhost:3000",
+        "http://localhost:3001"
+    };
+
     // WebSocket will use the separate port
     @Value("${websocket.server.port:8089}")
     private int webSocketPort;
@@ -39,7 +46,7 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
         // Register the "/ws" endpoint, enabling the SockJS protocol
         // SockJS is used to enable fallback options for browsers that don't support WebSocket
         registry.addEndpoint("/ws")
-               .setAllowedOrigins("http://localhost:3000", "http://localhost:3001")
+               .setAllowedOrigins(ALLOWED_ORIGINS)
                .withSockJS();
     }
 
@@ -59,11 +66,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer, WebSoc
     public void registerWebSocketHandlers(WebSocketHandlerRegistry registry) {
         // Register handler without SockJS for direct WebSocket connection
         registry.addHandler(chatWebSocketHandler, "/chat")
-            .setAllowedOrigins("http://localhost:3000", "http://localhost:3001");
+            .setAllowedOrigins(ALLOWED_ORIGINS);
             
         // Also register with SockJS for fallback
         registry.addHandler(chatWebSocketHandler, "/chat-sockjs")
-            .setAllowedOrigins("http://localhost:3000", "http://localhost:3001")
+            .setAllowedOrigins(ALLOWED_ORIGINS)
             .withSockJS();
     }
     
