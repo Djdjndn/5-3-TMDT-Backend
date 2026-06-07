@@ -31,7 +31,7 @@ HEALTHCHECK --interval=30s --timeout=3s \
 
 # Expose ports - API and WebSocket
 EXPOSE 8080
-EXPOSE 8088
+EXPOSE 8089
 
 # Set Java options for containerized environment
-ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"] 
+ENTRYPOINT ["java", "-XX:+UseContainerSupport", "-XX:MaxRAMPercentage=75.0", "-jar", "app.jar"]

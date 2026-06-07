@@ -48,7 +48,7 @@ services:
     networks:
       - tmdt-network
     healthcheck:
-      test: ["CMD-SHELL", "wget -q --spider http://localhost:8080/actuator/health || wget -q --spider http://localhost:8080/products"]
+      test: ["CMD-SHELL", "wget -q -O /dev/null http://localhost:8080/actuator/health"]
       interval: 20s
       timeout: 10s
       retries: 3

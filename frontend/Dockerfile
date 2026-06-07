@@ -76,7 +76,7 @@ RUN set -e \
        echo '# Wait for backend to be available'; \
        echo 'echo "Waiting for backend to be available at $BACKEND:$BACKEND_PORT..."'; \
        echo 'for i in $(seq 1 30); do'; \
-       echo '  if curl -s -f -o /dev/null http://$BACKEND:$BACKEND_PORT/actuator/health || curl -s -f -o /dev/null http://$BACKEND:$BACKEND_PORT/products; then'; \
+       echo '  if curl -s -f -o /dev/null http://$BACKEND:$BACKEND_PORT/actuator/health; then'; \
        echo '    echo "Backend is available!"'; \
        echo '    break'; \
        echo '  fi'; \
