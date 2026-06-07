@@ -286,8 +286,9 @@ public class ReviewController {
     public ResponseEntity<?> getProductReviewSummary(@PathVariable Long productId) {
         Product product = productService.getProduct(productId);
         
-        double averageRating = reviewService.getAverageRating(product);
-        int totalReviews = product.getReviewCount();
+        Double calculatedAverage = reviewService.getAverageRating(product);
+        double averageRating = calculatedAverage != null ? calculatedAverage : 0.0;
+        int totalReviews = product.getReviewCount() != null ? product.getReviewCount() : 0;
         
         // Tính phân bố đánh giá theo thang điểm
         int[] ratingCounts = new int[5];
@@ -497,4 +498,4 @@ public class ReviewController {
         }
     }
 
-} 
+}

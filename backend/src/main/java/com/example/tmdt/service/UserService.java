@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -112,6 +113,57 @@ public class UserService {
         
         return userRepository.save(user);
     }
+
+    public User updateUserByAdmin(
+            Long id,
+            String username,
+            String email,
+            String fullName,
+            String address,
+            String phoneNumber,
+            Boolean enabled,
+            List<String> roleNames) {
+        User user = getUserById(id);
+
+        if (username != null && !username.equals(user.getUsername())) {
+            if (userRepository.existsByUsername(username)) {
+                throw new IllegalArgumentException("Username is already in use");
+            }
+            user.setUsername(username);
+        }
+        if (email != null && !email.equals(user.getEmail())) {
+            if (userRepository.existsByEmail(email)) {
+                throw new IllegalArgumentException("Email is already in use");
+            }
+            user.setEmail(email);
+        }
+
+        user.setFullName(fullName);
+        user.setAddress(address);
+        user.setPhoneNumber(phoneNumber);
+        if (enabled != null) {
+            user.setEnabled(enabled);
+        }
+
+        if (roleNames != null && !roleNames.isEmpty()) {
+            Set<Role> roles = roleNames.stream()
+                    .map(name -> {
+                        String normalized = name.startsWith("ROLE_") ? name : "ROLE_" + name;
+                        Role.ERole roleName;
+                        try {
+                            roleName = Role.ERole.valueOf(normalized);
+                        } catch (IllegalArgumentException e) {
+                            throw new IllegalArgumentException("Invalid role: " + name);
+                        }
+                        return roleRepository.findByName(roleName)
+                                .orElseThrow(() -> new IllegalArgumentException("Role not found: " + normalized));
+                    })
+                    .collect(Collectors.toSet());
+            user.setRoles(roles);
+        }
+
+        return userRepository.save(user);
+    }
     
     public void deleteUser(Long id) {
         User user = getUserById(id);
@@ -130,4 +182,4 @@ public class UserService {
         user.setPassword(passwordEncoder.encode(newPassword));
         return userRepository.save(user);
     }
-} 
+}

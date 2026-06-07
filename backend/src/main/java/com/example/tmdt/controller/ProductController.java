@@ -152,6 +152,13 @@ public class ProductController {
         return new ResponseEntity<>(recommendedProducts.subList(0, actualLimit), HttpStatus.OK);
     }
 
+    @GetMapping("/max-price")
+    public ResponseEntity<Map<String, BigDecimal>> getMaxPrice() {
+        BigDecimal maxPrice = productRepository.findMaximumPrice();
+        return ResponseEntity.ok(Map.of(
+                "maxPrice", maxPrice != null ? maxPrice : BigDecimal.ZERO));
+    }
+
     @GetMapping("/{id}")
     public ResponseEntity<?> getProduct(@PathVariable Long id) {
         try {

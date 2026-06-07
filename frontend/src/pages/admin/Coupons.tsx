@@ -122,7 +122,7 @@ const AdminCoupons: React.FC = () => {
   
   const fetchUsers = async () => {
     try {
-      const response = await api.get('/users');
+      const response = await api.get('/admin/users');
       setUsers(response.data);
     } catch (error) {
       console.error('Error fetching users:', error);

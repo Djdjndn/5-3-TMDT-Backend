@@ -17,6 +17,8 @@ public interface ReviewHelpfulRepository extends JpaRepository<ReviewHelpful, Lo
     List<ReviewHelpful> findByReview(Review review);
     
     Optional<ReviewHelpful> findByReviewAndUser(Review review, User user);
+
+    List<ReviewHelpful> findByUser(User user);
     
     @Query("SELECT COUNT(rh) FROM ReviewHelpful rh WHERE rh.review = ?1 AND rh.isHelpful = true")
     long countHelpfulByReview(Review review);
@@ -25,4 +27,4 @@ public interface ReviewHelpfulRepository extends JpaRepository<ReviewHelpful, Lo
     long countNotHelpfulByReview(Review review);
     
     boolean existsByReviewAndUser(Review review, User user);
-} 
+}

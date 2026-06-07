@@ -23,7 +23,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     
     Page<Review> findByProductOrderByCreatedAtDesc(Product product, Pageable pageable);
     
-    Page<Review> findByProductAndRatingOrderByCreatedAtDesc(Product product, int rating, Pageable pageable);
+    Page<Review> findByProductAndRatingOrderByCreatedAtDesc(Product product, Double rating, Pageable pageable);
     
     boolean existsByUserAndProduct(User user, Product product);
     
@@ -31,7 +31,7 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
     long countByProduct(@Param("product") Product product);
     
     @Query("SELECT COUNT(r) FROM Review r WHERE r.product = :product AND r.rating = :rating")
-    long countByProductAndRating(@Param("product") Product product, @Param("rating") int rating);
+    long countByProductAndRating(@Param("product") Product product, @Param("rating") Double rating);
     
     @Query("SELECT AVG(r.rating) FROM Review r WHERE r.product = :product")
     Double calculateAverageRating(@Param("product") Product product);
@@ -44,4 +44,4 @@ public interface ReviewRepository extends JpaRepository<Review, Long> {
      */
     List<Review> findByUserAndProductOrderByCreatedAtDesc(User user, Product product);
 
-} 
+}

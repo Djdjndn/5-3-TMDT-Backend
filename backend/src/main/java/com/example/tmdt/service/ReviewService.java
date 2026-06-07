@@ -69,15 +69,15 @@ public class ReviewService {
     }
     
     public Page<Review> getReviewsByRating(Product product, int rating, Pageable pageable) {
-        return reviewRepository.findByProductAndRatingOrderByCreatedAtDesc(product, rating, pageable);
+        return reviewRepository.findByProductAndRatingOrderByCreatedAtDesc(product, (double) rating, pageable);
     }
     
-    public double getAverageRating(Product product) {
+    public Double getAverageRating(Product product) {
         return reviewRepository.calculateAverageRating(product);
     }
     
     public int countReviewsByRating(Product product, int rating) {
-        return (int) reviewRepository.countByProductAndRating(product, rating);
+        return (int) reviewRepository.countByProductAndRating(product, (double) rating);
     }
     
     @Transactional
@@ -259,4 +259,4 @@ public class ReviewService {
         return reviewRepository.findByUserAndProductOrderByCreatedAtDesc(user, product);
     }
 
-} 
+}

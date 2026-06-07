@@ -73,8 +73,14 @@ const buildAdminWebSocketUrl = (token: string) => {
   return `${base}/chat?token=${encodeURIComponent(token)}`;
 };
 
+const hasAdminRole = (roles: unknown) =>
+  Array.isArray(roles)
+    ? roles.some((role) => role === 'ADMIN' || role === 'ROLE_ADMIN')
+    : roles === 'ADMIN' || roles === 'ROLE_ADMIN';
+
 const AdminChat: React.FC = () => {
   const { user } = useAuth();
+  const isAdmin = hasAdminRole(user?.roles);
   const [socket, setSocket] = useState<WebSocket | null>(null);
   const [connected, setConnected] = useState(false);
   const [activeUsers, setActiveUsers] = useState<ActiveUser[]>([]);
@@ -93,13 +99,17 @@ const AdminChat: React.FC = () => {
 
   // Reset loggedOut flag when component mounts or when user changes
   useEffect(() => {
-    if (user && user.id) {
+    if (user && user.id && isAdmin) {
       loggedOutRef.current = false;
     }
-  }, [user]);
+  }, [user, isAdmin]);
 
   // Tải danh sách sessions khi mới vào trang
   useEffect(() => {
+    if (!isAdmin) {
+      return;
+    }
+
     loadActiveSessions();
     
     // Yêu cầu quyền thông báo từ trình duyệt
@@ -110,12 +120,12 @@ const AdminChat: React.FC = () => {
         });
       }
     }
-  }, []);
+  }, [isAdmin]);
 
   // Kết nối WebSocket
   useEffect(() => {
     // Only connect if user is logged in
-    if (user && user.id && localStorage.getItem('user')) {
+    if (user && user.id && isAdmin && localStorage.getItem('user')) {
       console.log('User is authenticated, connecting to WebSocket');
       connectToWebSocket();
     } else {
@@ -127,7 +137,7 @@ const AdminChat: React.FC = () => {
     return () => {
       disconnectWebSocket();
     };
-  }, [user]);
+  }, [user, isAdmin]);
 
   // Khởi tạo onmessage cho WebSocket
   useEffect(() => {
@@ -275,8 +285,9 @@ const AdminChat: React.FC = () => {
       const userId = userData.id;
       const username = userData.username;
       
-      if (!token || !userId) {
-        console.error('No token or userId found in user data');
+      if (!token || !userId || !hasAdminRole(userData.roles)) {
+        console.error('Admin credentials not found in user data');
+        loggedOutRef.current = true;
         return;
       }
       
@@ -382,6 +393,10 @@ const AdminChat: React.FC = () => {
 
   // Tải danh sách sessions
   const loadActiveSessions = async () => {
+    if (!isAdmin) {
+      return;
+    }
+
     try {
       setLoading(true);
       const sessions = await ChatService.getActiveChatSessions();

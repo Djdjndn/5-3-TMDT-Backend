@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -39,6 +40,8 @@ import com.example.tmdt.repository.ProductRepository;
 import com.example.tmdt.repository.UserRepository;
 import com.example.tmdt.repository.CouponRepository;
 import com.example.tmdt.service.OrderService;
+import com.example.tmdt.service.UserDeletionService;
+import com.example.tmdt.service.UserService;
 import java.time.LocalDateTime;
 import com.example.tmdt.service.ProductService;
 import com.example.tmdt.repository.CategoryRepository;
@@ -76,6 +79,12 @@ public class AdminController {
 
     @Autowired
     private ProductService productService;
+
+    @Autowired
+    private UserDeletionService userDeletionService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
     private final CategoryService categoryService;
@@ -176,7 +185,38 @@ public class AdminController {
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }
-    }    @PutMapping("/users/{id}/status")
+    }
+
+    @PutMapping("/users/{id}")
+    public ResponseEntity<?> updateUser(
+            @PathVariable Long id,
+            @RequestBody Map<String, Object> request) {
+        try {
+            String username = (String) request.get("username");
+            String email = (String) request.get("email");
+            String fullName = (String) request.get("fullName");
+            String address = (String) request.get("address");
+            String phoneNumber = (String) request.get("phoneNumber");
+            Boolean enabled = (Boolean) request.get("enabled");
+            List<String> roles = request.get("roles") instanceof List
+                    ? ((List<?>) request.get("roles")).stream()
+                            .map(String::valueOf)
+                            .collect(Collectors.toList())
+                    : List.of();
+
+            User updatedUser = userService.updateUserByAdmin(
+                    id, username, email, fullName, address, phoneNumber, enabled, roles);
+            return ResponseEntity.ok(updatedUser);
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
+        }
+    }
+
+    @PutMapping("/users/{id}/status")
     public ResponseEntity<?> updateUserStatus(@PathVariable Long id, @RequestBody Map<String, Boolean> request) {
         try {
             System.out.println("Updating user status for user ID: " + id);
@@ -225,12 +265,19 @@ public class AdminController {
     }
 
     @DeleteMapping("/users/{id}")
-    public ResponseEntity<HttpStatus> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<?> deleteUser(@PathVariable Long id) {
         try {
-            userRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+            userDeletionService.deleteUser(id);
+            return ResponseEntity.noContent().build();
+        } catch (UsernameNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Map.of("message", e.getMessage()));
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("message", e.getMessage()));
         } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("message", "Failed to delete user: " + e.getMessage()));
         }
     }
 
@@ -255,6 +302,13 @@ public class AdminController {
         List<Product> products = productRepository.findAll();
         System.out.println(products);
         return new ResponseEntity<>(products, HttpStatus.OK);
+    }
+
+    @GetMapping("/products/{id}")
+    public ResponseEntity<Product> getProductById(@PathVariable Long id) {
+        return productRepository.findById(id)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @PostMapping("/products")

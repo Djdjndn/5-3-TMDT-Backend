@@ -7,6 +7,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import javax.persistence.LockModeType;
+import java.math.BigDecimal;
 import java.util.List;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
@@ -16,6 +17,9 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> search(@Param("query") String query);
     
     List<Product> findByPriceBetween(double minPrice, double maxPrice);
+
+    @Query("SELECT MAX(p.price) FROM Product p")
+    BigDecimal findMaximumPrice();
     
     List<Product> findTop10ByOrderByAverageRatingDesc();
     
@@ -38,4 +42,4 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
     List<Product> findByCategoryNameIgnoreCaseAndNameContainingIgnoreCase(
             @Param("categoryName") String categoryName, 
             @Param("query") String query);
-} 
+}
